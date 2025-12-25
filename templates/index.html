@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Wind Turbine Fault Detection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-orange: #ff8a00;
+            --primary-orange-dark: #e56f00;
+            --bg-light: #fff7eb;
+            --white: #ffffff;
+            --text-dark: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--primary-orange), #ffe2b3);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            background: var(--white);
+            border-radius: 18px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+            padding: 25px 30px 30px;
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary-orange-dark);
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #fff7eb;
+            border: 1px solid var(--primary-orange);
+            color: var(--primary-orange-dark);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+
+        .form-card {
+            background: var(--bg-light);
+            border-radius: 14px;
+            padding: 16px 18px;
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+
+        .bulk-input {
+            margin-bottom: 12px;
+        }
+
+        .bulk-input label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #444;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .bulk-input textarea {
+            width: 100%;
+            min-height: 60px;
+            resize: vertical;
+            padding: 8px;
+            border-radius: 9px;
+            border: 1px solid #ddd;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .bulk-input textarea:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.2);
+        }
+
+        .hint {
+            font-size: 0.7rem;
+            color: #777;
+            margin-top: 4px;
+        }
+
+        .error-banner {
+            background: #ffe6d9;
+            color: #c23e18;
+            border-left: 4px solid #f05a28;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            margin-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        @media (max-width: 900px) {
+            .form-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        input[type="number"] {
+            padding: 6px 8px;
+            border-radius: 9px;
+            border: 1px solid #ddd;
+            font-size: 0.8rem;
+            outline: none;
+            transition: border 0.15s, box-shadow 0.15s;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.2);
+        }
+
+        .actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 999px;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
+        }
+
+        .btn-primary {
+            background: var(--primary-orange);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-orange-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #444;
+        }
+
+        .result-card {
+            border-radius: 14px;
+            border: 1px solid #f4d7ac;
+            background: #fffdf8;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-normal {
+            background: #e3f7e8;
+            color: #187a3b;
+        }
+
+        .status-fault {
+            background: #ffe3df;
+            color: #c7361f;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .status-dot.normal {
+            background: #21b357;
+        }
+
+        .status-dot.fault {
+            background: #f5523b;
+        }
+
+        .probability {
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        .chart-card {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 12px;
+            background: #fff;
+            border: 1px dashed #ffd4a8;
+        }
+
+        .chart-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #444;
+        }
+
+        .info-text {
+            font-size: 0.78rem;
+            color: #777;
+        }
+
+        .footer-note {
+            margin-top: 12px;
+            font-size: 0.7rem;
+            color: #999;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <div class="title">🌬️ Wind Turbine Fault Detector</div>
+                <div class="subtitle">
+                    Enter V1–V40 manually or paste a full CSV row to get a Normal / Abnormal prediction with
+                    explanation.
+                </div>
+            </div>
+            <div class="badge">SMOTE-balanced · All V-features</div>
+        </div>
+
+        <!-- LEFT: Input form -->
+        <div class="form-card">
+            {% if error_message %}
+            <div class="error-banner">
+                ⚠ {{ error_message }}
+            </div>
+            {% endif %}
+
+            <form method="POST">
+                <div class="bulk-input">
+                    <label for="bulk_values">Paste V1–V40 as comma-separated values (optional)</label>
+                    <textarea id="bulk_values" name="bulk_values"
+                        placeholder="-0.61,-3.81,2.20,...,0.45,-1.44">{{ bulk_values_text }}</textarea>
+                    <div class="hint">
+                        Example:<br>
+                        <code>-0.6134,-3.8196,2.2023,1.3004,...,0.4546,-1.4483</code><br>
+                        If you use this, it overrides the individual V inputs below.
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    {% for feat in all_features %}
+                    <div class="form-group">
+                        <label for="{{ feat }}" title="{{ feat }}">{{ feature_mapping[feat] }}</label>
+                        <input type="number" step="any" id="{{ feat }}" name="{{ feat }}"
+                            value="{{ input_values[feat] }}" placeholder="0.0">
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="actions">
+                    <button type="reset" class="btn btn-secondary">Clear</button>
+                    <button type="submit" class="btn btn-primary">Predict</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- RIGHT: Result -->
+        <div class="result-card">
+            <h3 style="margin: 0 0 4px 0;">Prediction</h3>
+            {% if prediction is not none %}
+            {% if prediction == 0 %}
+            <div class="status-pill status-normal">
+                <span class="status-dot normal"></span>
+                <span>{{ prediction_label }}</span>
+            </div>
+            {% else %}
+            <div class="status-pill status-fault">
+                <span class="status-dot fault"></span>
+                <span>{{ prediction_label }}</span>
+            </div>
+            {% endif %}
+
+            {% if probability is not none %}
+            <div class="probability">
+                Model probability of fault: <b>{{ '%.3f'|format(probability) }}</b>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="info-text">Submit the form to see the prediction and feature contribution graph.</div>
+            {% endif %}
+
+            {% if prediction == 1 %}
+            <div class="chart-card">
+                <div class="chart-title">Top contributing V-features (towards Abnormal)</div>
+                {% if shap_available and contribution_labels|length > 0 %}
+                <canvas id="contribChart" height="200"></canvas>
+                <div class="info-text">
+                    Higher bars = more impact on this specific fault prediction.
+                </div>
+                {% elif not shap_available %}
+                <div class="info-text">
+                    SHAP explainer is not available. Install <code>shap</code> and save
+                    <code>shap_explainer.joblib</code> to enable this.
+                </div>
+                {% else %}
+                <div class="info-text">
+                    Could not compute contributions for this input.
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div class="footer-note">
+                Use this as a decision-support tool; always confirm with engineering diagnostics.
+            </div>
+        </div>
+    </div>
+
+    {% if prediction == 1 and shap_available and contribution_labels|length > 0 %}
+    <script>
+        const featureLabels = JSON.parse('{{ contribution_labels|tojson }}');
+        const featureValues = JSON.parse('{{ contribution_values|tojson }}');
+
+        const ctx = document.getElementById('contribChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: featureLabels,
+                datasets: [{
+                    label: 'SHAP contribution',
+                    data: featureValues,
+                    borderRadius: 6,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Contribution value'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    </script>
+    {% endif %}
+
+</body>
+
+</html>
