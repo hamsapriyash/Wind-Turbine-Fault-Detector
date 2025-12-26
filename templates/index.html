@@ -3,418 +3,608 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Wind Turbine Fault Detection</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WindFault | SaaS Analytics Platform</title>
 
+    <!-- Modern SaaS Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            --primary-orange: #ff8a00;
-            --primary-orange-dark: #e56f00;
-            --bg-light: #fff7eb;
-            --white: #ffffff;
-            --text-dark: #333333;
+            /* Theme: Modern Indigo SaaS */
+            --primary: #4338ca;
+            /* Indigo 700 */
+            --primary-hover: #3730a3;
+            --primary-light: #e0e7ff;
+
+            --success: #10b981;
+            --success-bg: #d1fae5;
+            --danger: #ef4444;
+            --danger-bg: #fee2e2;
+
+            --bg-body: #f8fafc;
+            /* Slate 50 */
+            --surface: #ffffff;
+
+            --text-main: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+            --radius-card: 16px;
+            --radius-input: 10px;
         }
 
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, var(--primary-orange), #ffe2b3);
+            background-color: var(--bg-body);
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(67, 56, 202, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.08), transparent 25%);
+            color: var(--text-main);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-dark);
-        }
-
-        .container {
-            width: 95%;
-            max-width: 1200px;
-            background: var(--white);
-            border-radius: 18px;
-            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
-            padding: 25px 30px 30px;
-            display: grid;
-            grid-template-columns: 1.3fr 1fr;
-            gap: 20px;
-        }
-
-        @media (max-width: 900px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .header {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .title {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--primary-orange-dark);
-        }
-
-        .subtitle {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .badge {
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: #fff7eb;
-            border: 1px solid var(--primary-orange);
-            color: var(--primary-orange-dark);
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-        }
-
-        .form-card {
-            background: var(--bg-light);
-            border-radius: 14px;
-            padding: 16px 18px;
-            overflow-y: auto;
-            max-height: 70vh;
-        }
-
-        .bulk-input {
-            margin-bottom: 12px;
-        }
-
-        .bulk-input label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #444;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .bulk-input textarea {
-            width: 100%;
-            min-height: 60px;
-            resize: vertical;
-            padding: 8px;
-            border-radius: 9px;
-            border: 1px solid #ddd;
-            font-size: 0.8rem;
-            outline: none;
-        }
-
-        .bulk-input textarea:focus {
-            border-color: var(--primary-orange);
-            box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.2);
-        }
-
-        .hint {
-            font-size: 0.7rem;
-            color: #777;
-            margin-top: 4px;
-        }
-
-        .error-banner {
-            background: #ffe6d9;
-            color: #c23e18;
-            border-left: 4px solid #f05a28;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 0.78rem;
-            margin-bottom: 10px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        @media (max-width: 900px) {
-            .form-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        .form-group {
             display: flex;
             flex-direction: column;
         }
 
-        label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 4px;
-        }
-
-        input[type="number"] {
-            padding: 6px 8px;
-            border-radius: 9px;
-            border: 1px solid #ddd;
-            font-size: 0.8rem;
-            outline: none;
-            transition: border 0.15s, box-shadow 0.15s;
-        }
-
-        input[type="number"]:focus {
-            border-color: var(--primary-orange);
-            box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.2);
-        }
-
-        .actions {
-            margin-top: 12px;
+        /* --- Navbar --- */
+        .navbar {
+            height: 70px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
             display: flex;
+            align-items: center;
+            padding: 0 24px;
+        }
+
+        .nav-content {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--text-main);
+            letter-spacing: -0.03em;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(67, 56, 202, 0.2);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-item {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        /* --- Main Layout --- */
+        .main-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 32px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            /* Inputs Left, Analysis Right */
+            gap: 32px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+
+            /* Show results first on mobile */
+        }
+
+        /* --- Cards --- */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-card);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            padding: 24px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
             gap: 10px;
+        }
+
+        /* --- Inputs Form --- */
+        .bulk-section {
+            background: #f8fafc;
+            border: 1px dashed var(--border);
+            padding: 20px;
+            border-radius: var(--radius-input);
+            margin-bottom: 24px;
+        }
+
+        .bulk-input {
+            width: 100%;
+            min-height: 80px;
+            background: transparent;
+            border: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+            outline: none;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .form-input {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-input);
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .form-actions {
+            margin-top: 32px;
+            display: flex;
             justify-content: flex-end;
+            gap: 16px;
         }
 
         .btn {
             border: none;
-            border-radius: 999px;
-            padding: 8px 18px;
-            font-size: 0.85rem;
-            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
-        }
-
-        .btn-primary {
-            background: var(--primary-orange);
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-orange-dark);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
         }
 
         .btn-secondary {
-            background: #f0f0f0;
-            color: #444;
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
         }
 
-        .result-card {
-            border-radius: 14px;
-            border: 1px solid #f4d7ac;
-            background: #fffdf8;
-            padding: 16px 18px;
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(67, 56, 202, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(67, 56, 202, 0.3);
+        }
+
+        /* --- Sidebar & Status --- */
+        .sidebar {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 24px;
         }
 
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 12px;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 600;
+        .status-hero {
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .status-normal {
-            background: #e3f7e8;
-            color: #187a3b;
-        }
-
-        .status-fault {
-            background: #ffe3df;
-            color: #c7361f;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
+        /* Background decorative circle */
+        .status-hero::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
+            background: currentColor;
+            opacity: 0.05;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
         }
 
-        .status-dot.normal {
-            background: #21b357;
+        .status-hero.normal {
+            color: var(--success);
+            border-color: var(--success-bg);
         }
 
-        .status-dot.fault {
-            background: #f5523b;
+        .status-hero.fault {
+            color: var(--danger);
+            border-color: var(--danger-bg);
         }
 
-        .probability {
-            font-size: 0.8rem;
-            color: #555;
+        .status-hero.idle {
+            color: var(--text-secondary);
+            border-color: var(--border);
         }
 
-        .chart-card {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 12px;
-            background: #fff;
-            border: 1px dashed #ffd4a8;
+        .status-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            padding: 16px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: var(--shadow-sm);
         }
 
-        .chart-title {
+        .status-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+            color: var(--text-main);
+        }
+
+        .status-desc {
             font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #444;
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
         }
 
-        .info-text {
-            font-size: 0.78rem;
-            color: #777;
+        .chart-container {
+            position: relative;
+            height: 350px;
+            /* Large readable chart */
+            width: 100%;
         }
 
-        .footer-note {
-            margin-top: 12px;
-            font-size: 0.7rem;
-            color: #999;
+        .badge-pill {
+            padding: 6px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .error-message {
+            background: var(--danger-bg);
+            color: var(--danger);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <div class="header">
-            <div>
-                <div class="title">🌬️ Wind Turbine Fault Detector</div>
-                <div class="subtitle">
-                    Enter V1–V40 manually or paste a full CSV row to get a Normal / Abnormal prediction with
-                    explanation.
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="ph-bold ph-wind"></i>
                 </div>
+                <span>WindFault AI</span>
             </div>
-            <div class="badge">SMOTE-balanced · All V-features</div>
+            <div class="nav-links">
+                <span class="nav-item active">Dashboard</span>
+                <span class="nav-item">History</span>
+                <span class="nav-item">Settings</span>
+            </div>
         </div>
+    </nav>
 
-        <!-- LEFT: Input form -->
-        <div class="form-card">
-            {% if error_message %}
-            <div class="error-banner">
-                ⚠ {{ error_message }}
-            </div>
-            {% endif %}
+    <div class="main-container">
 
-            <form method="POST">
-                <div class="bulk-input">
-                    <label for="bulk_values">Paste V1–V40 as comma-separated values (optional)</label>
-                    <textarea id="bulk_values" name="bulk_values"
-                        placeholder="-0.61,-3.81,2.20,...,0.45,-1.44">{{ bulk_values_text }}</textarea>
-                    <div class="hint">
-                        Example:<br>
-                        <code>-0.6134,-3.8196,2.2023,1.3004,...,0.4546,-1.4483</code><br>
-                        If you use this, it overrides the individual V inputs below.
+        <!-- LEFT: Input Form -->
+        <main class="content-area">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="ph-duotone ph-sliders-horizontal"
+                            style="color: var(--primary); font-size: 1.5rem;"></i>
+                        <span>New Sensor Reading</span>
                     </div>
+                    <div class="badge-pill">Live Input</div>
                 </div>
 
-                <div class="form-grid">
-                    {% for feat in all_features %}
-                    <div class="form-group">
-                        <label for="{{ feat }}" title="{{ feat }}">{{ feature_mapping[feat] }}</label>
-                        <input type="number" step="any" id="{{ feat }}" name="{{ feat }}"
-                            value="{{ input_values[feat] }}" placeholder="0.0">
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <div class="actions">
-                    <button type="reset" class="btn btn-secondary">Clear</button>
-                    <button type="submit" class="btn btn-primary">Predict</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- RIGHT: Result -->
-        <div class="result-card">
-            <h3 style="margin: 0 0 4px 0;">Prediction</h3>
-            {% if prediction is not none %}
-            {% if prediction == 0 %}
-            <div class="status-pill status-normal">
-                <span class="status-dot normal"></span>
-                <span>{{ prediction_label }}</span>
-            </div>
-            {% else %}
-            <div class="status-pill status-fault">
-                <span class="status-dot fault"></span>
-                <span>{{ prediction_label }}</span>
-            </div>
-            {% endif %}
-
-            {% if probability is not none %}
-            <div class="probability">
-                Model probability of fault: <b>{{ '%.3f'|format(probability) }}</b>
-            </div>
-            {% endif %}
-            {% else %}
-            <div class="info-text">Submit the form to see the prediction and feature contribution graph.</div>
-            {% endif %}
-
-            {% if prediction == 1 %}
-            <div class="chart-card">
-                <div class="chart-title">Top contributing V-features (towards Abnormal)</div>
-                {% if shap_available and contribution_labels|length > 0 %}
-                <canvas id="contribChart" height="200"></canvas>
-                <div class="info-text">
-                    Higher bars = more impact on this specific fault prediction.
-                </div>
-                {% elif not shap_available %}
-                <div class="info-text">
-                    SHAP explainer is not available. Install <code>shap</code> and save
-                    <code>shap_explainer.joblib</code> to enable this.
-                </div>
-                {% else %}
-                <div class="info-text">
-                    Could not compute contributions for this input.
+                {% if error_message %}
+                <div class="error-message">
+                    <i class="ph-fill ph-warning-circle" style="font-size: 1.2rem;"></i>
+                    {{ error_message }}
                 </div>
                 {% endif %}
+
+                <form method="POST">
+
+                    <!-- CSV Paste -->
+                    <div class="bulk-section">
+                        <label
+                            style="font-size:0.8rem; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                            <i class="ph-bold ph-file-csv"></i> Quick Import
+                        </label>
+                        <textarea name="bulk_values" class="bulk-input"
+                            placeholder="Paste CSV row here to auto-fill (e.g., -0.61, -3.81, 2.20...)"
+                            spellcheck="false">{{ bulk_values_text }}</textarea>
+                    </div>
+
+                    <div
+                        style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin: 24px 0 16px; text-transform:uppercase; letter-spacing:0.05em;">
+                        Manual Sensor Telemetry
+                    </div>
+
+                    <!-- Input Grid -->
+                    <div class="input-grid">
+                        {% for feat in all_features %}
+                        <div class="input-group">
+                            <label for="{{ feat }}">{{ feature_mapping[feat] }}</label>
+                            <input type="number" step="any" id="{{ feat }}" name="{{ feat }}"
+                                value="{{ input_values[feat] }}" class="form-input" placeholder="0.0">
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="ph-bold ph-trash"></i> Clear
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ph-bold ph-lightning"></i> Run Diagnostics
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <!-- RIGHT: Analytics Sidebar -->
+        <aside class="sidebar">
+
+            <!-- Status Card -->
+            <div
+                class="card status-hero {% if prediction == 0 %}normal{% elif prediction == 1 %}fault{% else %}idle{% endif %}">
+                <div class="status-icon">
+                    {% if prediction == 0 %}
+                    <i class="ph-fill ph-check-circle" style="color: var(--success);"></i>
+                    {% elif prediction == 1 %}
+                    <i class="ph-fill ph-warning-octagon" style="color: var(--danger);"></i>
+                    {% else %}
+                    <i class="ph-fill ph-circles-three-plus" style="color: var(--primary);"></i>
+                    {% endif %}
+                </div>
+
+                {% if prediction is not none %}
+                <div class="status-title">
+                    {% if prediction == 0 %}System Normal{% else %}Fault Detected{% endif %}
+                </div>
+                <div class="status-desc">
+                    {% if prediction == 0 %}
+                    Operations are within optimal parameters.
+                    {% else %}
+                    Anomaly detected. Check contributing factors below.
+                    {% endif %}
+                </div>
+
+                {% if probability is not none %}
+                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--border);">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px;">
+                        <span>Confidence Score</span>
+                        <span>{{ '%.1f'|format(probability * 100) }}%</span>
+                    </div>
+                    <div style="height: 8px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
+                        <div
+                            style="height: 100%; width: {{ probability * 100 }}%; background: var(--primary); border-radius: 10px;">
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <div class="status-title">Ready to Scan</div>
+                <div class="status-desc">Enter sensor data to begin analysis.</div>
+                {% endif %}
+            </div>
+
+            <!-- Large Chart Section -->
+            {% if prediction == 1 %}
+            <div class="card">
+                <div class="card-header" style="border-bottom:none; margin-bottom:10px;">
+                    <div class="card-title" style="font-size:1rem;">Root Cause Analysis</div>
+                </div>
+                <div class="chart-container">
+                    {% if shap_available and contribution_labels|length > 0 %}
+                    <canvas id="largeChart"></canvas>
+                    {% else %}
+                    <div
+                        style="height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); text-align:center;">
+                        <p>Explanation data unavailable.<br><small>Ensure SHAP module is loaded.</small></p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
             {% endif %}
 
-            <div class="footer-note">
-                Use this as a decision-support tool; always confirm with engineering diagnostics.
-            </div>
-        </div>
+        </aside>
+
     </div>
 
+    <!-- Chart Script -->
     {% if prediction == 1 and shap_available and contribution_labels|length > 0 %}
     <script>
-        const featureLabels = JSON.parse('{{ contribution_labels|tojson }}');
-        const featureValues = JSON.parse('{{ contribution_values|tojson }}');
+        const ctx = document.getElementById('largeChart').getContext('2d');
+        const labels = JSON.parse('{{ contribution_labels|tojson }}');
+        const data = JSON.parse('{{ contribution_values|tojson }}');
 
-        const ctx = document.getElementById('contribChart').getContext('2d');
+        // Custom Gradient
+        const gradientRed = ctx.createLinearGradient(0, 0, 400, 0);
+        gradientRed.addColorStop(0, 'rgba(239, 68, 68, 0.9)');
+        gradientRed.addColorStop(1, 'rgba(220, 38, 38, 0.7)');
+
+        const gradientGreen = ctx.createLinearGradient(0, 0, 400, 0);
+        gradientGreen.addColorStop(0, 'rgba(16, 185, 129, 0.9)');
+        gradientGreen.addColorStop(1, 'rgba(5, 150, 105, 0.7)');
 
         new Chart(ctx, {
-            type: 'bar',
+            type: 'bar', // Horizontal bar is best for long labels
             data: {
-                labels: featureLabels,
+                labels: labels,
                 datasets: [{
-                    label: 'SHAP contribution',
-                    data: featureValues,
-                    borderRadius: 6,
-                    borderWidth: 1
+                    label: 'SHAP Value',
+                    data: data,
+                    backgroundColor: data.map(v => v > 0 ? gradientRed : gradientGreen),
+                    borderRadius: 4,
+                    barThickness: 24, // Thicker bars for readability
+                    borderSkipped: false
                 }]
             },
             options: {
                 indexAxis: 'y',
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Contribution value'
-                        }
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        padding: 14,
+                        cornerRadius: 8,
+                        titleFont: { family: 'Plus Jakarta Sans', size: 13 },
+                        bodyFont: { family: 'Plus Jakarta Sans', size: 13 },
+                        displayColors: false
                     }
                 },
-                plugins: {
-                    legend: { display: false }
+                scales: {
+                    x: {
+                        grid: { color: '#f1f5f9' },
+                        ticks: { font: { family: 'Plus Jakarta Sans', size: 11 }, color: '#94a3b8' }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
+                            color: '#475569',
+                            // Ensure long labels don't get cut off too aggressively
+                            callback: function (value) {
+                                const label = this.getLabelForValue(value);
+                                return label.length > 25 ? label.substr(0, 25) + '...' : label;
+                            }
+                        }
+                    }
                 }
             }
         });
