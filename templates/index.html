@@ -4,401 +4,401 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WindFault | SaaS Analytics Platform</title>
+    <title>Wind Turbine Fault Detector</title>
 
-    <!-- Modern SaaS Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
-
-    <!-- Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            /* Theme: Modern Indigo SaaS */
-            --primary: #4338ca;
-            /* Indigo 700 */
-            --primary-hover: #3730a3;
-            --primary-light: #e0e7ff;
-
+            /* Palette */
+            --primary: #2563eb;
+            /* Professional Blue */
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
             --success: #10b981;
-            --success-bg: #d1fae5;
+            /* Green */
             --danger: #ef4444;
-            --danger-bg: #fee2e2;
-
-            --bg-body: #f8fafc;
-            /* Slate 50 */
+            /* Red */
+            --warning: #f59e0b;
+            /* Amber */
+            --background: #f1f5f9;
+            /* Slate-100 */
             --surface: #ffffff;
-
-            --text-main: #0f172a;
-            --text-secondary: #64748b;
+            --text-main: #1e293b;
+            /* Slate-800 */
+            --text-muted: #64748b;
+            /* Slate-500 */
             --border: #e2e8f0;
+            /* Slate-200 */
 
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-
-            --radius-card: 16px;
-            --radius-input: 10px;
+            /* Spacing & Radius */
+            --radius-lg: 16px;
+            --radius-md: 8px;
+            --radius-sm: 4px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            background-color: var(--bg-body);
-            background-image:
-                radial-gradient(circle at 15% 50%, rgba(67, 56, 202, 0.08), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.08), transparent 25%);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #f1f5f9 100%);
             color: var(--text-main);
+            line-height: 1.5;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* --- Navbar --- */
-        .navbar {
-            height: 70px;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 50;
+        /* --- Layout --- */
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
             display: flex;
-            align-items: center;
-            padding: 0 24px;
+            flex-direction: column;
+            gap: 2rem;
         }
 
-        .nav-content {
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
         }
 
-        .logo {
+        .brand {
             display: flex;
             align-items: center;
             gap: 12px;
-            font-weight: 800;
-            font-size: 1.25rem;
-            color: var(--text-main);
-            letter-spacing: -0.03em;
         }
 
-        .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--primary), #6366f1);
+        .brand-icon {
+            font-size: 1.5rem;
+            background: var(--primary);
             color: white;
-            border-radius: 8px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 10px rgba(67, 56, 202, 0.2);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
         }
 
-        .nav-links {
-            display: flex;
-            gap: 20px;
+        .brand-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
         }
 
-        .nav-item {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: color 0.2s;
+        .brand-text p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
         }
 
-        .nav-item:hover {
-            color: var(--primary);
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            box-shadow: var(--shadow-sm);
         }
 
-        .nav-item.active {
-            color: var(--primary);
-        }
-
-        /* --- Main Layout --- */
-        .main-container {
-            width: 100%;
-            max-width: 1400px;
-            margin: 32px auto;
-            padding: 0 24px;
+        /* --- Dashboard Grid --- */
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: 1fr 420px;
-            /* Inputs Left, Analysis Right */
-            gap: 32px;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
             align-items: start;
         }
 
         @media (max-width: 1024px) {
-            .main-container {
+            .dashboard-grid {
                 grid-template-columns: 1fr;
             }
-
-            .sidebar {
-                order: -1;
-            }
-
-            /* Show results first on mobile */
         }
 
         /* --- Cards --- */
         .card {
             background: var(--surface);
-            border-radius: var(--radius-card);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
             padding: 24px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .card:hover {
-            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: box-shadow 0.2s ease;
         }
 
         .card-header {
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
         }
 
         .card-title {
             font-size: 1.1rem;
-            font-weight: 700;
+            font-weight: 600;
+            color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        /* --- Inputs Form --- */
-        .bulk-section {
-            background: #f8fafc;
-            border: 1px dashed var(--border);
-            padding: 20px;
-            border-radius: var(--radius-input);
-            margin-bottom: 24px;
+        /* --- Forms --- */
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
         }
 
-        .bulk-input {
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .textarea-styled {
             width: 100%;
             min-height: 80px;
-            background: transparent;
-            border: none;
-            font-family: 'JetBrains Mono', monospace;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: 'Inter', monospace;
+            /* Monospace for data data */
             font-size: 0.85rem;
+            transition: all 0.2s;
             resize: vertical;
+            background: #f8fafc;
+        }
+
+        .textarea-styled:focus {
             outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: white;
         }
 
-        .input-grid {
+        .helper-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .helper-text code {
+            background: #f1f5f9;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--primary-dark);
+        }
+
+        .sensor-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 8px;
+            /* Room for scrollbar */
         }
 
-        .input-group {
+        /* Custom Scrollbar */
+        .sensor-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sensor-grid::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sensor-grid::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        .sensor-item {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
 
-        .input-group label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-secondary);
+        .sensor-item label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .form-input {
-            background: var(--surface);
+        .input-styled {
+            width: 100%;
+            padding: 8px 12px;
             border: 1px solid var(--border);
-            border-radius: var(--radius-input);
-            padding: 10px 12px;
-            font-size: 0.95rem;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
             transition: all 0.2s;
-            color: var(--text-main);
         }
 
-        .form-input:focus {
+        .input-styled:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        .form-actions {
-            margin-top: 32px;
+        /* --- Buttons --- */
+        .actions {
             display: flex;
             justify-content: flex-end;
-            gap: 16px;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
         }
 
         .btn {
-            border: none;
-            cursor: pointer;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.95rem;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
+            justify-content: center;
+            padding: 10px 24px;
+            border-radius: 999px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
         }
 
-        .btn-secondary {
-            background: white;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
         }
 
-        .btn-secondary:hover {
+        .btn-ghost:hover {
             background: #f1f5f9;
             color: var(--text-main);
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            box-shadow: 0 4px 12px rgba(67, 56, 202, 0.25);
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.25);
         }
 
         .btn-primary:hover {
-            background: var(--primary-hover);
             transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(67, 56, 202, 0.3);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
         }
 
-        /* --- Sidebar & Status --- */
-        .sidebar {
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* --- Prediction Card --- */
+        .prediction-panel {
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
+            height: 100%;
         }
 
-        .status-hero {
+        .status-box {
             text-align: center;
-            padding: 40px 20px;
-            position: relative;
-            overflow: hidden;
+            padding: 32px 20px;
+            border-radius: var(--radius-lg);
+            background: #f8fafc;
+            border: 2px dashed var(--border);
         }
 
-        /* Background decorative circle */
-        .status-hero::before {
-            content: '';
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: currentColor;
-            opacity: 0.05;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 0;
+        .status-box.active-normal {
+            background: #ecfdf5;
+            border: 2px solid var(--success);
+            color: #064e3b;
         }
 
-        .status-hero.normal {
-            color: var(--success);
-            border-color: var(--success-bg);
-        }
-
-        .status-hero.fault {
-            color: var(--danger);
-            border-color: var(--danger-bg);
-        }
-
-        .status-hero.idle {
-            color: var(--text-secondary);
-            border-color: var(--border);
+        .status-box.active-fault {
+            background: #fef2f2;
+            border: 2px solid var(--danger);
+            color: #7f1d1d;
         }
 
         .status-icon {
-            font-size: 3rem;
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 1;
-            display: inline-flex;
-            padding: 16px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: var(--shadow-sm);
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            display: block;
         }
 
-        .status-title {
+        .status-label {
             font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 1;
-            color: var(--text-main);
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
         }
 
-        .status-desc {
+        .status-prob {
             font-size: 0.9rem;
-            color: var(--text-secondary);
-            position: relative;
-            z-index: 1;
+            opacity: 0.8;
         }
 
         .chart-container {
-            position: relative;
-            height: 350px;
-            /* Large readable chart */
-            width: 100%;
-        }
-
-        .badge-pill {
-            padding: 6px 12px;
-            border-radius: 99px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            background: var(--primary-light);
-            color: var(--primary);
+            margin-top: 1rem;
+            background: white;
+            padding: 16px;
+            border-radius: var(--radius-lg);
+            /* border: 1px solid var(--border); */
+            /* box-shadow: var(--shadow-sm); */
         }
 
         .error-message {
-            background: var(--danger-bg);
-            color: var(--danger);
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            background: #fef2f2;
+            color: #b91c1c;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            border-left: 4px solid #ef4444;
             font-size: 0.9rem;
-            font-weight: 500;
+        }
+
+        .empty-state {
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-content">
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="ph-bold ph-wind"></i>
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <div class="brand">
+                <div class="brand-icon">⚡</div>
+                <div class="brand-text">
+                    <h1>TurbineGuard AI</h1>
+                    <p>Real-time Fault Detection System</p>
                 </div>
                 <span>WindFault AI</span>
             </div>
@@ -407,143 +407,151 @@
                 <span class="nav-item">History</span>
                 <span class="nav-item">Settings</span>
             </div>
-        </div>
-    </nav>
+            <div class="status-badge">
+                <span
+                    style="width:8px; height:8px; background:var(--success); border-radius:50%; margin-right:6px;"></span>
+                System Active
+            </div>
+        </header>
 
-    <div class="main-container">
+        <!-- Main Grid -->
+        <div class="dashboard-grid">
 
-        <!-- LEFT: Input Form -->
-        <main class="content-area">
+            <!-- Sensor Inputs -->
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">
-                        <i class="ph-duotone ph-sliders-horizontal"
-                            style="color: var(--primary); font-size: 1.5rem;"></i>
-                        <span>New Sensor Reading</span>
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                        Sensor Data Input
                     </div>
-                    <div class="badge-pill">Live Input</div>
                 </div>
 
                 {% if error_message %}
                 <div class="error-message">
-                    <i class="ph-fill ph-warning-circle" style="font-size: 1.2rem;"></i>
                     {{ error_message }}
                 </div>
                 {% endif %}
 
                 <form method="POST">
-
-                    <!-- CSV Paste -->
-                    <div class="bulk-section">
-                        <label
-                            style="font-size:0.8rem; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-                            <i class="ph-bold ph-file-csv"></i> Quick Import
-                        </label>
-                        <textarea name="bulk_values" class="bulk-input"
-                            placeholder="Paste CSV row here to auto-fill (e.g., -0.61, -3.81, 2.20...)"
-                            spellcheck="false">{{ bulk_values_text }}</textarea>
+                    <!-- Bulk Input -->
+                    <div class="input-group">
+                        <label for="bulk_values">Quick Import (CSV Row)</label>
+                        <textarea id="bulk_values" name="bulk_values" class="textarea-styled"
+                            placeholder="Paste your 40 comma-separated sensor values here...">{{ bulk_values_text }}</textarea>
+                        <div class="helper-text">
+                            Expected: 40 values. Example: <code>-0.61, -3.81, 2.20...</code>
+                        </div>
                     </div>
 
-                    <div
-                        style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); margin: 24px 0 16px; text-transform:uppercase; letter-spacing:0.05em;">
-                        Manual Sensor Telemetry
+                    <div style="margin: 20px 0; border-bottom: 1px solid var(--border); position: relative;">
+                        <span
+                            style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: white; padding: 0 10px; color: var(--text-muted); font-size: 0.8rem;">OR
+                            EDIT MANUALLY</span>
                     </div>
 
-                    <!-- Input Grid -->
-                    <div class="input-grid">
+                    <!-- Individual Inputs -->
+                    <div class="sensor-grid">
                         {% for feat in all_features %}
-                        <div class="input-group">
-                            <label for="{{ feat }}">{{ feature_mapping[feat] }}</label>
+                        <div class="sensor-item">
+                            <label for="{{ feat }}" title="{{ feature_mapping[feat] }}">
+                                {{ feature_mapping[feat] }}
+                            </label>
                             <input type="number" step="any" id="{{ feat }}" name="{{ feat }}"
-                                value="{{ input_values[feat] }}" class="form-input" placeholder="0.0">
+                                value="{{ input_values[feat] }}" class="input-styled" placeholder="0.0">
                         </div>
                         {% endfor %}
                     </div>
 
-                    <div class="form-actions">
-                        <button type="reset" class="btn btn-secondary">
-                            <i class="ph-bold ph-trash"></i> Clear
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="ph-bold ph-lightning"></i> Run Diagnostics
-                        </button>
+                    <div class="actions">
+                        <button type="reset" class="btn btn-ghost">Reset Form</button>
+                        <button type="submit" class="btn btn-primary">Run Diagnostics</button>
                     </div>
                 </form>
             </div>
-        </main>
 
-        <!-- RIGHT: Analytics Sidebar -->
-        <aside class="sidebar">
+            <!-- Analysis & Results -->
+            <div class="prediction-panel">
 
-            <!-- Status Card -->
-            <div
-                class="card status-hero {% if prediction == 0 %}normal{% elif prediction == 1 %}fault{% else %}idle{% endif %}">
-                <div class="status-icon">
-                    {% if prediction == 0 %}
-                    <i class="ph-fill ph-check-circle" style="color: var(--success);"></i>
-                    {% elif prediction == 1 %}
-                    <i class="ph-fill ph-warning-octagon" style="color: var(--danger);"></i>
-                    {% else %}
-                    <i class="ph-fill ph-circles-three-plus" style="color: var(--primary);"></i>
-                    {% endif %}
-                </div>
-
-                {% if prediction is not none %}
-                <div class="status-title">
-                    {% if prediction == 0 %}System Normal{% else %}Fault Detected{% endif %}
-                </div>
-                <div class="status-desc">
-                    {% if prediction == 0 %}
-                    Operations are within optimal parameters.
-                    {% else %}
-                    Anomaly detected. Check contributing factors below.
-                    {% endif %}
-                </div>
-
-                {% if probability is not none %}
-                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--border);">
-                    <div
-                        style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px;">
-                        <span>Confidence Score</span>
-                        <span>{{ '%.1f'|format(probability * 100) }}%</span>
-                    </div>
-                    <div style="height: 8px; background: #e2e8f0; border-radius: 10px; overflow: hidden;">
-                        <div
-                            style="height: 100%; width: {{ probability * 100 }}%; background: var(--primary); border-radius: 10px;">
+                <div class="card" style="flex:0 0 auto;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Diagnostic Status
                         </div>
                     </div>
-                </div>
-                {% endif %}
 
-                {% else %}
-                <div class="status-title">Ready to Scan</div>
-                <div class="status-desc">Enter sensor data to begin analysis.</div>
-                {% endif %}
-            </div>
-
-            <!-- Large Chart Section -->
-            {% if prediction == 1 %}
-            <div class="card">
-                <div class="card-header" style="border-bottom:none; margin-bottom:10px;">
-                    <div class="card-title" style="font-size:1rem;">Root Cause Analysis</div>
-                </div>
-                <div class="chart-container">
-                    {% if shap_available and contribution_labels|length > 0 %}
-                    <canvas id="largeChart"></canvas>
+                    {% if prediction is not none %}
+                    {% if prediction == 0 %}
+                    <div class="status-box active-normal">
+                        <span class="status-icon">✅</span>
+                        <span class="status-label">{{ prediction_label }}</span>
+                        {% if probability is not none %}
+                        <div class="status-prob">Fault Probability: <b>{{ '%.1f'|format(probability * 100) }}%</b></div>
+                        {% endif %}
+                    </div>
                     {% else %}
-                    <div
-                        style="height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); text-align:center;">
-                        <p>Explanation data unavailable.<br><small>Ensure SHAP module is loaded.</small></p>
+                    <div class="status-box active-fault">
+                        <span class="status-icon">⚠️</span>
+                        <span class="status-label">{{ prediction_label }}</span>
+                        {% if probability is not none %}
+                        <div class="status-prob">Fault Probability: <b>{{ '%.1f'|format(probability * 100) }}%</b></div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="status-box" style="background: #f1f5f9; border-color: transparent;">
+                        <span class="status-icon">🔍</span>
+                        <span class="status-label" style="font-weight:400; font-size:1.1rem; color:var(--text-muted);">
+                            Awaiting Input
+                        </span>
+                        <div class="status-prob">Enter data to analyze system health.</div>
                     </div>
                     {% endif %}
                 </div>
+
+                <!-- Explanation Panel -->
+                {% if prediction == 1 %}
+                <div class="card" style="flex:1;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                            </svg>
+                            Root Cause Analysis
+                        </div>
+                    </div>
+
+                    {% if shap_available and contribution_labels|length > 0 %}
+                    <div class="chart-container">
+                        <canvas id="contribChart" width="400" height="300"></canvas>
+                    </div>
+                    <p class="helper-text" style="text-align:center; margin-top:10px;">
+                        Top factors contributing to the detected fault.
+                    </p>
+                    {% elif not shap_available %}
+                    <div class="empty-state">
+                        SHAP explainer model not found. Cannot generate analysis.
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        No significant contributing factors identified.
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
             </div>
-            {% endif %}
-
-        </aside>
-
+        </div>
     </div>
 
+    <!-- Chart Script -->
     <!-- Chart Script -->
     {% if prediction == 1 and shap_available and contribution_labels|length > 0 %}
     <script>
@@ -551,60 +559,38 @@
         const labels = JSON.parse('{{ contribution_labels|tojson }}');
         const data = JSON.parse('{{ contribution_values|tojson }}');
 
-        // Custom Gradient
-        const gradientRed = ctx.createLinearGradient(0, 0, 400, 0);
-        gradientRed.addColorStop(0, 'rgba(239, 68, 68, 0.9)');
-        gradientRed.addColorStop(1, 'rgba(220, 38, 38, 0.7)');
+        const ctx = document.getElementById('contribChart').getContext('2d');
 
-        const gradientGreen = ctx.createLinearGradient(0, 0, 400, 0);
-        gradientGreen.addColorStop(0, 'rgba(16, 185, 129, 0.9)');
-        gradientGreen.addColorStop(1, 'rgba(5, 150, 105, 0.7)');
+        // Custom Color Palette for Chart
+        const barColors = featureValues.map(val => val > 0 ? '#ef4444' : '#10b981');
 
         new Chart(ctx, {
             type: 'bar', // Horizontal bar is best for long labels
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'SHAP Value',
-                    data: data,
-                    backgroundColor: data.map(v => v > 0 ? gradientRed : gradientGreen),
+                    label: 'Contribution Impact',
+                    data: featureValues,
+                    backgroundColor: barColors,
                     borderRadius: 4,
-                    barThickness: 24, // Thicker bars for readability
-                    borderSkipped: false
                 }]
             },
             options: {
-                indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#1e293b',
-                        padding: 14,
-                        cornerRadius: 8,
-                        titleFont: { family: 'Plus Jakarta Sans', size: 13 },
-                        bodyFont: { family: 'Plus Jakarta Sans', size: 13 },
-                        displayColors: false
-                    }
-                },
+                indexAxis: 'y', // Horizontal bars
                 scales: {
                     x: {
-                        grid: { color: '#f1f5f9' },
-                        ticks: { font: { family: 'Plus Jakarta Sans', size: 11 }, color: '#94a3b8' }
+                        grid: { display: false },
+                        title: { display: true, text: 'SHAP Value (Impact)', color: '#94a3b8' }
                     },
                     y: {
                         grid: { display: false },
-                        ticks: {
-                            font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
-                            color: '#475569',
-                            // Ensure long labels don't get cut off too aggressively
-                            callback: function (value) {
-                                const label = this.getLabelForValue(value);
-                                return label.length > 25 ? label.substr(0, 25) + '...' : label;
-                            }
-                        }
+                        ticks: { autoSkip: false, font: { size: 11 }, color: '#475569' }
                     }
+                },
+                plugins: {
+                    legend: { display: false }
                 }
             }
         });
