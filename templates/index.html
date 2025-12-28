@@ -402,157 +402,130 @@
                 </div>
                 <span>WindFault AI</span>
             </div>
-            <div class="nav-links">
-                <span class="nav-item active">Dashboard</span>
-                <span class="nav-item">History</span>
-                <span class="nav-item">Settings</span>
-            </div>
-            <div class="status-badge">
-                <span
-                    style="width:8px; height:8px; background:var(--success); border-radius:50%; margin-right:6px;"></span>
-                System Active
-            </div>
-        </header>
-
-        <!-- Main Grid -->
-        <div class="dashboard-grid">
-
-            <!-- Sensor Inputs -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                        </svg>
-                        Sensor Data Input
-                    </div>
-                </div>
-
-                {% if error_message %}
-                <div class="error-message">
-                    {{ error_message }}
-                </div>
-                {% endif %}
-
-                <form method="POST">
-                    <!-- Bulk Input -->
-                    <div class="input-group">
-                        <label for="bulk_values">Quick Import (CSV Row)</label>
-                        <textarea id="bulk_values" name="bulk_values" class="textarea-styled"
-                            placeholder="Paste your 40 comma-separated sensor values here...">{{ bulk_values_text }}</textarea>
-                        <div class="helper-text">
-                            Expected: 40 values. Example: <code>-0.61, -3.81, 2.20...</code>
-                        </div>
-                    </div>
-
-                    <div style="margin: 20px 0; border-bottom: 1px solid var(--border); position: relative;">
-                        <span
-                            style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: white; padding: 0 10px; color: var(--text-muted); font-size: 0.8rem;">OR
-                            EDIT MANUALLY</span>
-                    </div>
-
-                    <!-- Individual Inputs -->
-                    <div class="sensor-grid">
-                        {% for feat in all_features %}
-                        <div class="sensor-item">
-                            <label for="{{ feat }}" title="{{ feature_mapping[feat] }}">
-                                {{ feature_mapping[feat] }}
-                            </label>
-                            <input type="number" step="any" id="{{ feat }}" name="{{ feat }}"
-                                value="{{ input_values[feat] }}" class="input-styled" placeholder="0.0">
-                        </div>
-                        {% endfor %}
-                    </div>
-
-                    <div class="actions">
-                        <button type="reset" class="btn btn-ghost">Reset Form</button>
-                        <button type="submit" class="btn btn-primary">Run Diagnostics</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Analysis & Results -->
-            <div class="prediction-panel">
-
-                <div class="card" style="flex:0 0 auto;">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Diagnostic Status
-                        </div>
-                    </div>
-
-                    {% if prediction is not none %}
-                    {% if prediction == 0 %}
-                    <div class="status-box active-normal">
-                        <span class="status-icon">✅</span>
-                        <span class="status-label">{{ prediction_label }}</span>
-                        {% if probability is not none %}
-                        <div class="status-prob">Fault Probability: <b>{{ '%.1f'|format(probability * 100) }}%</b></div>
-                        {% endif %}
-                    </div>
-                    {% else %}
-                    <div class="status-box active-fault">
-                        <span class="status-icon">⚠️</span>
-                        <span class="status-label">{{ prediction_label }}</span>
-                        {% if probability is not none %}
-                        <div class="status-prob">Fault Probability: <b>{{ '%.1f'|format(probability * 100) }}%</b></div>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                    {% else %}
-                    <div class="status-box" style="background: #f1f5f9; border-color: transparent;">
-                        <span class="status-icon">🔍</span>
-                        <span class="status-label" style="font-weight:400; font-size:1.1rem; color:var(--text-muted);">
-                            Awaiting Input
-                        </span>
-                        <div class="status-prob">Enter data to analyze system health.</div>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Explanation Panel -->
-                {% if prediction == 1 %}
-                <div class="card" style="flex:1;">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                            </svg>
-                            Root Cause Analysis
-                        </div>
-                    </div>
-
-                    {% if shap_available and contribution_labels|length > 0 %}
-                    <div class="chart-container">
-                        <canvas id="contribChart" width="400" height="300"></canvas>
-                    </div>
-                    <p class="helper-text" style="text-align:center; margin-top:10px;">
-                        Top factors contributing to the detected fault.
-                    </p>
-                    {% elif not shap_available %}
-                    <div class="empty-state">
-                        SHAP explainer model not found. Cannot generate analysis.
-                    </div>
-                    {% else %}
-                    <div class="empty-state">
-                        No significant contributing factors identified.
-                    </div>
-                    {% endif %}
-                </div>
-                {% endif %}
-
-            </div>
-        </div>
+            <div class="badge">SMOTE-balanced · All V-features</div>
     </div>
 
-    <!-- Chart Script -->
-    <!-- Chart Script -->
+    <!-- LEFT: Input form -->
+    <div class="form-card">
+        {% if error_message %}
+        <div class="error-banner">
+            ⚠ {{ error_message }}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            <div class="bulk-input">
+                <label for="bulk_values">Paste V1–V40 as comma-separated values (optional)</label>
+                <textarea id="bulk_values" name="bulk_values"
+                    placeholder="-0.61,-3.81,2.20,...,0.45,-1.44">{{ bulk_values_text }}</textarea>
+                <div class="hint">
+                    Example:<br>
+                    <code>-0.6134,-3.8196,2.2023,1.3004,...,0.4546,-1.4483</code><br>
+                    If you use this, it overrides the individual V inputs below.
+                </div>
+
+                <div style="margin: 20px 0; border-bottom: 1px solid var(--border); position: relative;">
+                    <span
+                        style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: white; padding: 0 10px; color: var(--text-muted); font-size: 0.8rem;">OR
+                        EDIT MANUALLY</span>
+                </div>
+
+                <div class="form-grid">
+                    {% for feat in all_features %}
+                    <div class="form-group">
+                        <label for="{{ feat }}" title="{{ feat }}">{{ feature_mapping[feat] }}</label>
+                        <input type="number" step="any" id="{{ feat }}" name="{{ feat }}"
+                            value="{{ input_values[feat] }}" placeholder="0.0">
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="actions">
+                    <button type="reset" class="btn btn-ghost">Reset Form</button>
+                    <button type="submit" class="btn btn-primary">Run Diagnostics</button>
+                </div>
+        </form>
+    </div>
+
+    <!-- Analysis & Results -->
+    <div class="prediction-panel">
+
+        <div class="card" style="flex:0 0 auto;">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Diagnostic Status
+                </div>
+            </div>
+
+            {% if prediction is not none %}
+            {% if prediction == 0 %}
+            <div class="status-box active-normal">
+                <span class="status-icon">✅</span>
+                <span class="status-label">{{ prediction_label }}</span>
+                {% if probability is not none %}
+                <div class="status-prob">Fault Probability: <b>{{ '%.1f'|format(probability * 100) }}%</b></div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="status-box active-fault">
+                <span class="status-icon">⚠️</span>
+                <span class="status-label">{{ prediction_label }}</span>
+                {% if probability is not none %}
+                <div class="status-prob">Fault Probability: <b>{{ '%.1f'|format(probability * 100) }}%</b></div>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="status-box" style="background: #f1f5f9; border-color: transparent;">
+                <span class="status-icon">🔍</span>
+                <span class="status-label" style="font-weight:400; font-size:1.1rem; color:var(--text-muted);">
+                    Awaiting Input
+                </span>
+                <div class="status-prob">Enter data to analyze system health.</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Explanation Panel -->
+        {% if prediction == 1 %}
+        <div class="card" style="flex:1;">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                    </svg>
+                    Root Cause Analysis
+                </div>
+            </div>
+
+            {% if shap_available and contribution_labels|length > 0 %}
+            <div class="chart-container">
+                <canvas id="contribChart" width="400" height="300"></canvas>
+            </div>
+            <p class="helper-text" style="text-align:center; margin-top:10px;">
+                Top factors contributing to the detected fault.
+            </p>
+            {% elif not shap_available %}
+            <div class="empty-state">
+                SHAP explainer model not found. Cannot generate analysis.
+            </div>
+            {% else %}
+            <div class="empty-state">
+                No significant contributing factors identified.
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+    </div>
+    </div>
+
     {% if prediction == 1 and shap_available and contribution_labels|length > 0 %}
     <script>
         const ctx = document.getElementById('largeChart').getContext('2d');
