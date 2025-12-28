@@ -5,6 +5,6 @@ joblib
 scikit-learn
 shap
 gunicorn
-waitress
 matplotlib
 scipy
+imbalanced-learn

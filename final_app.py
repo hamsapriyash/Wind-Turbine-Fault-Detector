@@ -2,7 +2,6 @@ from flask import Flask, render_template, request
 import numpy as np
 import pandas as pd
 import joblib
-import os
 
 app = Flask(__name__)
 
@@ -201,8 +200,4 @@ def index():
 
 
 if __name__ == "__main__":
-    # Get port from environment variable for production (default to 5000)
-    port = int(os.environ.get("PORT", 5000))
-    # In production, debug should be False
-    debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() == "true"
-    app.run(host="0.0.0.0", port=port, debug=debug_mode)
+    app.run(debug=True)
