@@ -3,388 +3,546 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Wind Turbine Fault Detection</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wind Turbine Fault Detector</title>
 
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            --primary-orange: #ff8a00;
-            --primary-orange-dark: #e56f00;
-            --bg-light: #fff7eb;
-            --white: #ffffff;
-            --text-dark: #333333;
+            /* Palette */
+            --primary: #2563eb;
+            /* Professional Blue */
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --success: #10b981;
+            /* Green */
+            --danger: #ef4444;
+            /* Red */
+            --warning: #f59e0b;
+            /* Amber */
+            --background: #f1f5f9;
+            /* Slate-100 */
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            /* Slate-800 */
+            --text-muted: #64748b;
+            /* Slate-500 */
+            --border: #e2e8f0;
+            /* Slate-200 */
+
+            /* Spacing & Radius */
+            --radius-lg: 16px;
+            --radius-md: 8px;
+            --radius-sm: 4px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
 
         * {
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, var(--primary-orange), #ffe2b3);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #f1f5f9 100%);
+            color: var(--text-main);
+            line-height: 1.5;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Layout --- */
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            font-size: 1.5rem;
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-dark);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
         }
 
-        .container {
-            width: 95%;
-            max-width: 1200px;
-            background: var(--white);
-            border-radius: 18px;
-            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
-            padding: 25px 30px 30px;
+        .brand-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
+        }
+
+        .brand-text p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* --- Dashboard Grid --- */
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: 1.3fr 1fr;
-            gap: 20px;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            align-items: start;
         }
 
-        @media (max-width: 900px) {
-            .container {
+        @media (max-width: 1024px) {
+            .dashboard-grid {
                 grid-template-columns: 1fr;
             }
         }
 
-        .header {
-            grid-column: 1 / -1;
+        /* --- Cards --- */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 24px;
+            border: 1px solid var(--border);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card-header {
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
         }
 
-        .title {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--primary-orange-dark);
-        }
-
-        .subtitle {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .badge {
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: #fff7eb;
-            border: 1px solid var(--primary-orange);
-            color: var(--primary-orange-dark);
-            font-size: 0.8rem;
+        .card-title {
+            font-size: 1.1rem;
             font-weight: 600;
-            letter-spacing: 0.03em;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .form-card {
-            background: var(--bg-light);
-            border-radius: 14px;
-            padding: 16px 18px;
+        /* --- Forms --- */
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .textarea-styled {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: 'Inter', monospace;
+            /* Monospace for data data */
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            resize: vertical;
+            background: #f8fafc;
+        }
+
+        .textarea-styled:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: white;
+        }
+
+        .helper-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .helper-text code {
+            background: #f1f5f9;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--primary-dark);
+        }
+
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            max-height: 60vh;
             overflow-y: auto;
-            max-height: 70vh;
+            padding-right: 8px;
+            /* Room for scrollbar */
         }
 
-        .bulk-input {
+        /* Custom Scrollbar */
+        .sensor-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sensor-grid::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sensor-grid::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        .sensor-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sensor-item label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .input-styled {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .input-styled:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* --- Buttons --- */
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 24px;
+            border-radius: 999px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .btn-ghost:hover {
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* --- Prediction Card --- */
+        .prediction-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .status-box {
+            text-align: center;
+            padding: 32px 20px;
+            border-radius: var(--radius-lg);
+            background: #f8fafc;
+            border: 2px dashed var(--border);
+        }
+
+        .status-box.active-normal {
+            background: #ecfdf5;
+            border: 2px solid var(--success);
+            color: #064e3b;
+        }
+
+        .status-box.active-fault {
+            background: #fef2f2;
+            border: 2px solid var(--danger);
+            color: #7f1d1d;
+        }
+
+        .status-icon {
+            font-size: 2.5rem;
             margin-bottom: 12px;
+            display: block;
         }
 
-        .bulk-input label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #444;
+        .status-label {
+            font-size: 1.5rem;
+            font-weight: 700;
             display: block;
             margin-bottom: 4px;
         }
 
-        .bulk-input textarea {
-            width: 100%;
-            min-height: 60px;
-            resize: vertical;
-            padding: 8px;
-            border-radius: 9px;
-            border: 1px solid #ddd;
-            font-size: 0.8rem;
-            outline: none;
-        }
-
-        .bulk-input textarea:focus {
-            border-color: var(--primary-orange);
-            box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.2);
-        }
-
-        .hint {
-            font-size: 0.7rem;
-            color: #777;
-            margin-top: 4px;
-        }
-
-        .error-banner {
-            background: #ffe6d9;
-            color: #c23e18;
-            border-left: 4px solid #f05a28;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 0.78rem;
-            margin-bottom: 10px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        @media (max-width: 900px) {
-            .form-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 4px;
-        }
-
-        input[type="number"] {
-            padding: 6px 8px;
-            border-radius: 9px;
-            border: 1px solid #ddd;
-            font-size: 0.8rem;
-            outline: none;
-            transition: border 0.15s, box-shadow 0.15s;
-        }
-
-        input[type="number"]:focus {
-            border-color: var(--primary-orange);
-            box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.2);
-        }
-
-        .actions {
-            margin-top: 12px;
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        .btn {
-            border: none;
-            border-radius: 999px;
-            padding: 8px 18px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
-        }
-
-        .btn-primary {
-            background: var(--primary-orange);
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-orange-dark);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #444;
-        }
-
-        .result-card {
-            border-radius: 14px;
-            border: 1px solid #f4d7ac;
-            background: #fffdf8;
-            padding: 16px 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 12px;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .status-normal {
-            background: #e3f7e8;
-            color: #187a3b;
-        }
-
-        .status-fault {
-            background: #ffe3df;
-            color: #c7361f;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .status-dot.normal {
-            background: #21b357;
-        }
-
-        .status-dot.fault {
-            background: #f5523b;
-        }
-
-        .probability {
-            font-size: 0.8rem;
-            color: #555;
-        }
-
-        .chart-card {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 12px;
-            background: #fff;
-            border: 1px dashed #ffd4a8;
-        }
-
-        .chart-title {
+        .status-prob {
             font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #444;
+            opacity: 0.8;
         }
 
-        .info-text {
-            font-size: 0.78rem;
-            color: #777;
+        .chart-container {
+            margin-top: 1rem;
+            background: white;
+            padding: 16px;
+            border-radius: var(--radius-lg);
+            /* border: 1px solid var(--border); */
+            /* box-shadow: var(--shadow-sm); */
         }
 
-        .footer-note {
-            margin-top: 12px;
-            font-size: 0.7rem;
-            color: #999;
+        .error-message {
+            background: #fef2f2;
+            color: #b91c1c;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            border-left: 4px solid #ef4444;
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <div class="header">
-            <div>
-                <div class="title">🌬️ Wind Turbine Fault Detector</div>
-                <div class="subtitle">
-                    Enter V1–V40 manually or paste a full CSV row to get a Normal / Abnormal prediction with
-                    explanation.
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <div class="brand">
+                <div class="brand-icon">⚡</div>
+                <div class="brand-text">
+                    <h1>TurbineGuard AI</h1>
+                    <p>Real-time Fault Detection System</p>
                 </div>
             </div>
-            <div class="badge">SMOTE-balanced · All V-features</div>
-        </div>
-
-        <!-- LEFT: Input form -->
-        <div class="form-card">
-            {% if error_message %}
-            <div class="error-banner">
-                ⚠ {{ error_message }}
+            <div class="status-badge">
+                <span
+                    style="width:8px; height:8px; background:var(--success); border-radius:50%; margin-right:6px;"></span>
+                System Active
             </div>
-            {% endif %}
+        </header>
 
-            <form method="POST">
-                <div class="bulk-input">
-                    <label for="bulk_values">Paste V1–V40 as comma-separated values (optional)</label>
-                    <textarea id="bulk_values" name="bulk_values"
-                        placeholder="-0.61,-3.81,2.20,...,0.45,-1.44">{{ bulk_values_text }}</textarea>
-                    <div class="hint">
-                        Example:<br>
-                        <code>-0.6134,-3.8196,2.2023,1.3004,...,0.4546,-1.4483</code><br>
-                        If you use this, it overrides the individual V inputs below.
+        <!-- Main Grid -->
+        <div class="dashboard-grid">
+
+            <!-- Sensor Inputs -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                        Sensor Data Input
                     </div>
                 </div>
 
-                <div class="form-grid">
-                    {% for feat in all_features %}
-                    <div class="form-group">
-                        <label for="{{ feat }}" title="{{ feat }}">{{ feature_mapping[feat] }}</label>
-                        <input type="number" step="any" id="{{ feat }}" name="{{ feat }}"
-                            value="{{ input_values[feat] }}" placeholder="0.0">
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <div class="actions">
-                    <button type="reset" class="btn btn-secondary">Clear</button>
-                    <button type="submit" class="btn btn-primary">Predict</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- RIGHT: Result -->
-        <div class="result-card">
-            <h3 style="margin: 0 0 4px 0;">Prediction</h3>
-            {% if prediction is not none %}
-            {% if prediction == 0 %}
-            <div class="status-pill status-normal">
-                <span class="status-dot normal"></span>
-                <span>{{ prediction_label }}</span>
-            </div>
-            {% else %}
-            <div class="status-pill status-fault">
-                <span class="status-dot fault"></span>
-                <span>{{ prediction_label }}</span>
-            </div>
-            {% endif %}
-
-            {% if probability is not none %}
-            <div class="probability">
-                Model probability of fault: <b>{{ '%.3f'|format(probability) }}</b>
-            </div>
-            {% endif %}
-            {% else %}
-            <div class="info-text">Submit the form to see the prediction and feature contribution graph.</div>
-            {% endif %}
-
-            {% if prediction == 1 %}
-            <div class="chart-card">
-                <div class="chart-title">Top contributing V-features (towards Abnormal)</div>
-                {% if shap_available and contribution_labels|length > 0 %}
-                <canvas id="contribChart" height="200"></canvas>
-                <div class="info-text">
-                    Higher bars = more impact on this specific fault prediction.
-                </div>
-                {% elif not shap_available %}
-                <div class="info-text">
-                    SHAP explainer is not available. Install <code>shap</code> and save
-                    <code>shap_explainer.joblib</code> to enable this.
-                </div>
-                {% else %}
-                <div class="info-text">
-                    Could not compute contributions for this input.
+                {% if error_message %}
+                <div class="error-message">
+                    {{ error_message }}
                 </div>
                 {% endif %}
-            </div>
-            {% endif %}
 
-            <div class="footer-note">
-                Use this as a decision-support tool; always confirm with engineering diagnostics.
+                <form method="POST">
+                    <!-- Bulk Input -->
+                    <div class="input-group">
+                        <label for="bulk_values">Quick Import (CSV Row)</label>
+                        <textarea id="bulk_values" name="bulk_values" class="textarea-styled"
+                            placeholder="Paste your 40 comma-separated sensor values here...">{{ bulk_values_text }}</textarea>
+                        <div class="helper-text">
+                            Expected: 40 values. Example: <code>-0.61, -3.81, 2.20...</code>
+                        </div>
+                    </div>
+
+                    <div style="margin: 20px 0; border-bottom: 1px solid var(--border); position: relative;">
+                        <span
+                            style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: white; padding: 0 10px; color: var(--text-muted); font-size: 0.8rem;">OR
+                            EDIT MANUALLY</span>
+                    </div>
+
+                    <!-- Individual Inputs -->
+                    <div class="sensor-grid">
+                        {% for feat in all_features %}
+                        <div class="sensor-item">
+                            <label for="{{ feat }}" title="{{ feature_mapping[feat] }}">
+                                {{ feature_mapping[feat] }}
+                            </label>
+                            <input type="number" step="any" id="{{ feat }}" name="{{ feat }}"
+                                value="{{ input_values[feat] }}" class="input-styled" placeholder="0.0">
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="actions">
+                        <button type="reset" class="btn btn-ghost">Reset Form</button>
+                        <button type="submit" class="btn btn-primary">Run Diagnostics</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Analysis & Results -->
+            <div class="prediction-panel">
+
+                <div class="card" style="flex:0 0 auto;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Diagnostic Status
+                        </div>
+                    </div>
+
+                    {% if prediction is not none %}
+                    {% if prediction == 0 %}
+                    <div class="status-box active-normal">
+                        <span class="status-icon">✅</span>
+                        <span class="status-label">{{ prediction_label }}</span>
+                        {% if probability is not none %}
+                        <div class="status-prob">Fault Probability: <b>{{ '%.1f'|format(probability * 100) }}%</b></div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="status-box active-fault">
+                        <span class="status-icon">⚠️</span>
+                        <span class="status-label">{{ prediction_label }}</span>
+                        {% if probability is not none %}
+                        <div class="status-prob">Fault Probability: <b>{{ '%.1f'|format(probability * 100) }}%</b></div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="status-box" style="background: #f1f5f9; border-color: transparent;">
+                        <span class="status-icon">🔍</span>
+                        <span class="status-label" style="font-weight:400; font-size:1.1rem; color:var(--text-muted);">
+                            Awaiting Input
+                        </span>
+                        <div class="status-prob">Enter data to analyze system health.</div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Explanation Panel -->
+                {% if prediction == 1 %}
+                <div class="card" style="flex:1;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                            </svg>
+                            Root Cause Analysis
+                        </div>
+                    </div>
+
+                    {% if shap_available and contribution_labels|length > 0 %}
+                    <div class="chart-container">
+                        <canvas id="contribChart" width="400" height="300"></canvas>
+                    </div>
+                    <p class="helper-text" style="text-align:center; margin-top:10px;">
+                        Top factors contributing to the detected fault.
+                    </p>
+                    {% elif not shap_available %}
+                    <div class="empty-state">
+                        SHAP explainer model not found. Cannot generate analysis.
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        No significant contributing factors identified.
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
             </div>
         </div>
     </div>
 
+    <!-- Chart Script -->
     {% if prediction == 1 and shap_available and contribution_labels|length > 0 %}
     <script>
         const featureLabels = JSON.parse('{{ contribution_labels|tojson }}');
@@ -392,25 +550,32 @@
 
         const ctx = document.getElementById('contribChart').getContext('2d');
 
+        // Custom Color Palette for Chart
+        const barColors = featureValues.map(val => val > 0 ? '#ef4444' : '#10b981');
+
         new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: featureLabels,
                 datasets: [{
-                    label: 'SHAP contribution',
+                    label: 'Contribution Impact',
                     data: featureValues,
-                    borderRadius: 6,
-                    borderWidth: 1
+                    backgroundColor: barColors,
+                    borderRadius: 4,
                 }]
             },
             options: {
-                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', // Horizontal bars
                 scales: {
                     x: {
-                        title: {
-                            display: true,
-                            text: 'Contribution value'
-                        }
+                        grid: { display: false },
+                        title: { display: true, text: 'SHAP Value (Impact)', color: '#94a3b8' }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { autoSkip: false, font: { size: 11 }, color: '#475569' }
                     }
                 },
                 plugins: {
